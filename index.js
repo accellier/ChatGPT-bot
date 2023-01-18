@@ -4,67 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.code === "Enter") {
       let input = inputField.value;
       inputField.value = "";
-      output(input);
+      addChat(input);
     }
   });
 });
 
-function output(input) {
-  let product;
-
-  // Regex remove non word/space chars
-  // Trim trailing whitespce
-  // Remove digits - not sure if this is best
-  // But solves problem of entering something like 'hi1'
-
-  let text = input.toLowerCase().replace(/[^\w\s]/gi, "").replace(/[\d]/gi, "").trim();
-  text = text
-    .replace(/ a /g, " ")   // 'tell me a story' -> 'tell me story'
-    .replace(/i feel /g, "")
-    .replace(/whats/g, "what is")
-    .replace(/please /g, "")
-    .replace(/ please/g, "")
-    .replace(/r u/g, "are you");
-
-  if (compare(prompts, replies, text)) { 
-    // Search for exact match in `prompts`
-    product = compare(prompts, replies, text);
-  } else if (text.match(/thank/gi)) {
-    product = "You're welcome!"
-  } else if (text.match(/(corona|covid|virus)/gi)) {
-    // If no match, check if message contains `coronavirus`
-    product = coronavirus[Math.floor(Math.random() * coronavirus.length)];
-  } else {
-    // If all else fails: random alternative
-    product = alternative[Math.floor(Math.random() * alternative.length)];
-  }
-
-  // Update DOM
-  addChat(input, product);
-}
-
-function compare(promptsArray, repliesArray, string) {
-  let reply;
-  let replyFound = false;
-  for (let x = 0; x < promptsArray.length; x++) {
-    for (let y = 0; y < promptsArray[x].length; y++) {
-      if (promptsArray[x][y] === string) {
-        let replies = repliesArray[x];
-        reply = replies[Math.floor(Math.random() * replies.length)];
-        replyFound = true;
-        // Stop inner loop when input value matches prompts
-        break;
-      }
-    }
-    if (replyFound) {
-      // Stop outer loop when reply is found instead of interating through the entire array
-      break;
-    }
-  }
-  return reply;
-}
-
-function addChat(input, product) {
+async function addChat(input) {
   const messagesContainer = document.getElementById("messages");
 
   let userDiv = document.createElement("div");
@@ -87,11 +32,36 @@ function addChat(input, product) {
   // Keep messages at most recent
   messagesContainer.scrollTop = messagesContainer.scrollHeight - messagesContainer.clientHeight;
 
-  // Fake delay to seem "real"
-  setTimeout(() => {
-    botText.innerText = `${product}`;
-    textToSpeech(product)
-  }, 2000
-  )
+  //This calls the function to make the request.
+  let cgpt = await getChatGPT(input);
+  //Set the botText innerText to the result from the getChatGPT function
+  botText.innerText = cgpt.botResponse;
+}
 
+async function getChatGPT(prompt){
+
+  //Change 'xx-xxxx' to your own API Key provided by openai.com
+  //Read the docs at https://beta.openai.com/docs/introduction for info on how to adjust model, temperature, tokens etc below.
+  
+  const response = await fetch('https://api.openai.com/v1/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer xx-xxxx'
+    },
+    body: JSON.stringify({
+      'model': 'text-davinci-003',
+      'prompt': prompt,
+      'temperature': 0,
+      'max_tokens': 7
+    })
+  });
+  const json = await response.json();
+  
+  //response ID not used but could be useful later
+  //seems to always add a /n newline character to response hence trimStart()
+  return {
+    'botResponse': json.choices[0].text.trimStart(),
+    'id': json.id
+  };
 }
