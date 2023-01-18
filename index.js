@@ -41,8 +41,9 @@ async function addChat(input) {
 async function getChatGPT(prompt){
 
   //Change 'xx-xxxx' to your own API Key provided by openai.com
+  //This was for prototyping only - DO NOT store your API key here for any production use as any user can see it.
+  //For production you would want a more sophisticated approach to call the API from the server not the client (i.e. through NodeJS or PHP)
   //Read the docs at https://beta.openai.com/docs/introduction for info on how to adjust model, temperature, tokens etc below.
-  
   const response = await fetch('https://api.openai.com/v1/completions', {
     method: 'POST',
     headers: {
@@ -57,7 +58,7 @@ async function getChatGPT(prompt){
     })
   });
   const json = await response.json();
-  
+
   //response ID not used but could be useful later
   //seems to always add a /n newline character to response hence trimStart()
   return {
