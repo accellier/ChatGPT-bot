@@ -65,3 +65,4 @@ async function getChatGPT(prompt){
     'id': json.id
   };
 }
+
