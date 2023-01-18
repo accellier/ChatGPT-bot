@@ -1,11 +1,5 @@
-# JavaScript Chatbot 
+# JavaScript Chatbot connected to ChatGPT API.
 
-This is a very simple "chatbot" using nothing but JavaScript, HTML, & CSS. I put this in quotes because chatbots these days are way more complex - this is an exercise in vanilla JS loops and conditionals, not AI.
+This adapts sylviapap's chatbot interface and instead makes a request to the ChatGPT API.
 
-I hope it makes a good intro for anyone interested in chatbots and frontend fundamentals.
-
-Enjoy!
-
-[Demo](https://sylviapap.github.io/chatbot/)
-
-[Blog post](https://dev.to/sylviapap/make-a-simple-chatbot-with-javascript-1gc)
+This was made purely for demonstration purposes in a project and not suitable for production as the API key is stored directly in index.js. This is not good practice.
